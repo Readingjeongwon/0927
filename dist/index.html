@@ -103,6 +103,12 @@ table.tbl tbody th{width:7.5rem;color:var(--sub);font-weight:700;white-space:now
 .entry .part{font-size:.75rem;font-weight:800;letter-spacing:.14em;color:var(--sub)}
 .entry .title{font-size:1.05rem;font-weight:900}
 .entry .desc{font-size:.88rem;color:var(--sub)}
+.entry-thumb{height:7rem;margin:-.15rem 0 .55rem;border-radius:.65rem;background:#F6C744;display:grid;grid-template-columns:repeat(2,1fr);gap:.45rem;padding:.7rem;overflow:hidden}
+.entry-thumb span{display:flex;align-items:flex-end;padding:.5rem;border-radius:.45rem;color:#111;font-size:.7rem;font-weight:900;line-height:1.25}
+.entry-thumb span:nth-child(1){background:#FF9D8A}
+.entry-thumb span:nth-child(2){background:#8FD9C1}
+.entry-thumb span:nth-child(3){background:#86C7F3}
+.entry-thumb span:nth-child(4){background:#FFF2B5}
 
 /* 프롬프트 목록 */
 .phead{display:flex;justify-content:space-between;align-items:center;gap:.8rem;flex-wrap:wrap;margin-bottom:.4rem}
@@ -218,6 +224,9 @@ footer nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 .3
           <span class="desc">← → 이동 · G 전체보기 · P PDF 저장</span>
         </a>
         <a class="entry" href="#prompts">
+          <span class="entry-thumb" aria-hidden="true">
+            <span>장면 회상</span><span>작은 성취</span><span>셀프칭찬</span><span>한 주 실천</span>
+          </span>
           <span class="part">수업 자료</span>
           <span class="title">프롬프트 다시 보기 →</span>
           <span class="desc">복사 · TXT 내려받기</span>
