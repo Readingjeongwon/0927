@@ -314,5 +314,21 @@ footer nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 .3
   });
 })();
 </script>
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
+  import { getAnalytics } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-analytics.js';
+
+  const firebaseConfig = {
+    apiKey: 'AIzaSyBXXfzc1PhZPgjY7jDiJuKzVn-rDfVR3zs',
+    authDomain: 'project42-b5f93.firebaseapp.com',
+    projectId: 'project42-b5f93',
+    storageBucket: 'project42-b5f93.firebasestorage.app',
+    messagingSenderId: '645766021777',
+    appId: '1:645766021777:web:ecc2cc1bc5e6137b16b530',
+    measurementId: 'G-94T9BQL9Q8'
+  };
+
+  getAnalytics(initializeApp(firebaseConfig));
+</script>
 </body>
 </html>
