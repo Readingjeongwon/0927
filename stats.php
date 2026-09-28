@@ -8,8 +8,9 @@
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 
-// 반드시 변경: 배포 전 나만 아는 긴 값으로 교체 · 이 파일을 공개 저장소(GitHub)에 올리지 않기
-$ADMIN_PASSWORD = 'change-me';
+// 호스팅 환경변수에 나만 아는 긴 값을 설정 · 소스와 .env에는 실제 비밀번호를 기록하지 않기
+$ADMIN_PASSWORD = getenv('ADMIN_PASSWORD');
+if ($ADMIN_PASSWORD === false) $ADMIN_PASSWORD = '';
 
 $DATA_DIR = __DIR__ . '/data';
 if (!is_dir($DATA_DIR)) @mkdir($DATA_DIR, 0755, true);
@@ -54,7 +55,7 @@ function out($data, $code = 200) {
 
 function check_password($pw) {
     global $ADMIN_PASSWORD;
-    if ($ADMIN_PASSWORD === 'change-me') return false; // 기본값 그대로면 관리자 기능 전체 잠금
+    if ($ADMIN_PASSWORD === '') return false; // 환경변수 미설정 시 관리자 기능 전체 잠금
     return is_string($pw) && $pw !== '' && hash_equals($ADMIN_PASSWORD, $pw);
 }
 

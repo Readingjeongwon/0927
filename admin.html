@@ -10,7 +10,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>관리자 제어판 · 셀프칭찬 생활두뇌운동 42</title>
+<title>관리자 제어판 · 생활두뇌운동</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#111111">
@@ -108,6 +108,20 @@ td.act{text-align:right;white-space:nowrap}
 #gateErr{color:var(--alert);font-size:.88rem;font-weight:700;min-height:1.3em}
 [hidden]{display:none!important}
 
+.empty-state{padding:1.4rem .5rem;color:var(--sub);text-align:center}
+#storageWarning{position:fixed;left:0;right:0;bottom:0;background:#FFF2B5;color:#111;padding:1rem;margin:0;font-weight:700;z-index:10}
+#status{max-width:calc(100vw - 2rem);width:max-content}
+@media (max-width:520px){
+  .card[aria-labelledby="hReview"] table{display:block}
+  .card[aria-labelledby="hReview"] thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+  #rvBody{display:block}
+  #rvBody tr{display:grid;grid-template-columns:1fr auto;padding:.8rem 0;border-bottom:1px solid var(--line);gap:.6rem}
+  #rvBody td{border:0;padding:0}
+  #rvBody .stars{white-space:nowrap;text-align:right}
+  #rvBody .txt,#rvBody .act,#rvBody .empty-state{grid-column:1/-1}
+  #rvBody .act{padding-top:.3rem}
+  .addrow input{width:100%;flex-basis:100%}
+}
 @media (prefers-reduced-motion:reduce){ .switch::after, #status{transition:none} }
 </style>
 </head>
@@ -117,7 +131,7 @@ td.act{text-align:right;white-space:nowrap}
 <div id="gate">
   <form id="gateForm" autocomplete="off">
     <h1>관리자 제어판 <span class="demo-badge">데모</span></h1>
-    <p class="warn-box">데모 전용 잠금 · 실제 보안 아님 · 비밀번호가 소스에 그대로 보임 · 실제 운영은 stats.php 의 check_admin 으로 교체</p>
+    <p class="warn-box">데모 전용 잠금 · 실제 보안 아님 · 실제 운영 전 서버 인증 설정 필요</p>
     <label for="pw">비밀번호 (데모: 1234)</label>
     <!-- 서버 연결 지점: stats.php action=check_admin (POST pw) → { ok: true } 일 때만 입장 -->
     <input id="pw" type="password" inputmode="numeric" autocomplete="off" required>
@@ -152,7 +166,7 @@ td.act{text-align:right;white-space:nowrap}
         <button type="button" class="btn" id="nextBtn">다음 ▶</button>
       </div>
       <div class="jump" id="jump" role="group" aria-label="번호로 이동"></div>
-      <p class="note">점선 번호 = 휴식 슬라이드 · TITLES 배열은 slides.html 의 aria-label 과 같은 순서로 유지</p>
+      <p class="note">점선 번호는 휴식 슬라이드 · 번호를 눌러 이동</p>
     </section>
 
     <!-- ② 정책 스위치 -->
@@ -161,13 +175,13 @@ td.act{text-align:right;white-space:nowrap}
       <!-- 서버 연결 지점: stats.php action=set_lock (POST pw, value=1|0) -->
       <div class="switchrow">
         <p id="swLockDesc"><b>진행 잠금</b>켜면 수강생 화면이 강사 위치를 따라감</p>
-        <div class="sw-wrap"><span class="sw-state" id="swLockState" aria-hidden="true">OFF</span>
+        <div class="sw-wrap"><span class="sw-state" id="swLockState" aria-hidden="true">꺼짐</span>
           <div class="switch" id="swLock" role="switch" aria-checked="false" tabindex="0" aria-labelledby="swLockDesc"></div></div>
       </div>
       <!-- 서버 연결 지점: stats.php action=set_pdf (POST pw, value=1|0) -->
       <div class="switchrow">
         <p id="swPdfDesc"><b>PDF 저장 허용</b>끄면 슬라이드의 PDF 버튼·P 키 차단</p>
-        <div class="sw-wrap"><span class="sw-state" id="swPdfState" aria-hidden="true">OFF</span>
+        <div class="sw-wrap"><span class="sw-state" id="swPdfState" aria-hidden="true">꺼짐</span>
           <div class="switch" id="swPdf" role="switch" aria-checked="false" tabindex="0" aria-labelledby="swPdfDesc"></div></div>
       </div>
     </section>
@@ -222,6 +236,7 @@ td.act{text-align:right;white-space:nowrap}
   </main>
 </div>
 
+<p id="storageWarning" role="alert" hidden></p>
 <p id="status" role="status" aria-live="polite"></p>
 
 <script>
@@ -257,7 +272,7 @@ td.act{text-align:right;white-space:nowrap}
   }
 
   function lsGet(k){ try { return localStorage.getItem(k); } catch (e) { return null; } }
-  function lsSet(k, v){ try { localStorage.setItem(k, v); } catch (e) { /* 저장 불가 환경 · 메모리 상태로만 동작 */ } }
+  function lsSet(k, v){ try { localStorage.setItem(k, v); return true; } catch (e) { return false; } }
   function ssGet(k){ try { return sessionStorage.getItem(k); } catch (e) { return null; } }
   function ssSet(k, v){ try { if (v === null) sessionStorage.removeItem(k); else sessionStorage.setItem(k, v); } catch (e) { /* 무시 */ } }
 
@@ -274,10 +289,17 @@ td.act{text-align:right;white-space:nowrap}
   var S = load();
 
   /* 서버 연결 지점: 실제 운영에서는 save() 대신 각 동작마다 stats.php 를 호출하고, 응답으로 S 를 갱신한 뒤 render() */
-  function save(){ lsSet(STATE_KEY, JSON.stringify(S)); }
+  var saveFailed = false;
+  function save(){
+    saveFailed = !lsSet(STATE_KEY, JSON.stringify(S));
+    var warning = document.getElementById('storageWarning');
+    warning.hidden = !saveFailed;
+    warning.textContent = saveFailed ? '저장하지 못했습니다. 새로고침하면 변경 내용이 사라질 수 있습니다. 브라우저 저장 공간과 설정을 확인해 주세요.' : '';
+  }
 
   var statusEl = document.getElementById('status');
   function say(m){
+    if (saveFailed) m = '변경 내용 저장 실패 · 화면 아래 안내 확인';
     statusEl.textContent = m; statusEl.classList.add('show');
     clearTimeout(say.t); say.t = setTimeout(function(){ statusEl.classList.remove('show'); }, 1600);
   }
@@ -327,7 +349,7 @@ td.act{text-align:right;white-space:nowrap}
     var key = switchKey(id);
     function toggle(){
       S[key] = !S[key]; save(); render();
-      say(SWITCH_LABELS[key] + ' ' + (S[key] ? 'ON' : 'OFF'));
+      say(SWITCH_LABELS[key] + ' ' + (S[key] ? '켜짐' : '꺼짐'));
     }
     el.addEventListener('click', toggle);
     el.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
@@ -380,6 +402,7 @@ td.act{text-align:right;white-space:nowrap}
   var rvBody = document.getElementById('rvBody');
   function renderReviews(){
     rvBody.textContent = '';
+    if (!S.reviews.length) emptyRow(rvBody, 4, '등록된 후기가 없습니다.');
     S.reviews.forEach(function(r){
       var tr = document.createElement('tr');
       var tdName = document.createElement('td'); tdName.textContent = r.name;
@@ -410,10 +433,18 @@ td.act{text-align:right;white-space:nowrap}
     document.getElementById('rvCount').textContent = '전체 ' + S.reviews.length + '건 · 공개 ' + pubCount + '건';
   }
 
+  function emptyRow(body, columns, message){
+    var row = document.createElement('tr');
+    var cell = document.createElement('td');
+    cell.colSpan = columns; cell.className = 'empty-state'; cell.textContent = message;
+    row.appendChild(cell); body.appendChild(row);
+  }
+
   /* ---------- ⑤ 명단 ---------- */
   var rsBody = document.getElementById('rsBody');
   function renderRoster(){
     rsBody.textContent = '';
+    if (!S.roster.length) emptyRow(rsBody, 3, '등록된 참가자가 없습니다. 아래에서 이름을 추가해 주세요.');
     S.roster.forEach(function(p){
       var tr = document.createElement('tr');
       var a = document.createElement('td'); a.textContent = p.name;
@@ -454,7 +485,7 @@ td.act{text-align:right;white-space:nowrap}
     SWITCH_IDS.forEach(function(id){
       var on = !!S[switchKey(id)];
       document.getElementById(id).setAttribute('aria-checked', on ? 'true' : 'false');
-      document.getElementById(id + 'State').textContent = on ? 'ON' : 'OFF';
+      document.getElementById(id + 'State').textContent = on ? '켜짐' : '꺼짐';
     });
 
     document.querySelectorAll('.preset').forEach(function(b){

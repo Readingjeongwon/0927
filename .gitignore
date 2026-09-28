@@ -1,0 +1,7 @@
+# 로컬 환경변수와 비밀 설정
+.env
+.env.*
+!.env.example
+
+# PHP 런타임 데이터
+data/

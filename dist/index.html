@@ -16,7 +16,18 @@
 <meta property="og:title" content="생활두뇌운동 · 시니어 50분 강의">
 <meta property="og:description" content="일상 기억 깨우기 · 작은 성취 발견 · 셀프칭찬 실천 · 2026년 10월 21일">
 <meta property="og:url" content="https://bmct-self-praise-42.workspace-288742.chatgpt.site/">
-<meta property="og:image" content="https://bmct-self-praise-42.workspace-288742.chatgpt.site/assets/self-praise.jpg">
+<meta property="og:image" content="https://bmct-self-praise-42.workspace-288742.chatgpt.site/assets/share-preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:alt" content="생활두뇌운동 · 시니어 50분 강의 · 일상 기억 깨우기와 셀프칭찬 실천">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:site_name" content="생활두뇌운동">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="생활두뇌운동 · 시니어 50분 강의">
+<meta name="twitter:description" content="일상 기억 깨우기 · 작은 성취 발견 · 셀프칭찬 실천 · 2026년 10월 21일">
+<meta name="twitter:image" content="https://bmct-self-praise-42.workspace-288742.chatgpt.site/assets/share-preview.png">
+<meta name="twitter:image:alt" content="생활두뇌운동 · 시니어 50분 강의">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
@@ -205,7 +216,7 @@ footer nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 .3
     <div class="wrap">
       <div class="phead">
         <h2 id="pTitle">자료 · 프롬프트</h2>
-        <button type="button" class="pbtn ghost" id="dlTxt">전체 받기 (TXT)</button>
+        <button type="button" class="pbtn ghost" id="dlTxt">전체 받기 (텍스트 파일)</button>
       </div>
       <p class="pnote">수업 중 바로 복사해 쓰는 회상·셀프칭찬 문장</p>
       <ol class="plist" id="plist"></ol>
@@ -229,7 +240,7 @@ footer nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 .3
           </span>
           <span class="part">수업 자료</span>
           <span class="title">프롬프트 다시 보기 →</span>
-          <span class="desc">복사 · TXT 내려받기</span>
+          <span class="desc">복사 · 텍스트 파일 내려받기</span>
         </a>
       </div>
     </div>
@@ -259,9 +270,9 @@ footer nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 .3
 
   var list = document.getElementById('plist');
   var status = document.getElementById('pStatus');
-  function say(m){ status.textContent = m; clearTimeout(say.t); say.t = setTimeout(function(){ status.textContent = ''; }, 2000); }
+  function say(m){ status.textContent = m; clearTimeout(say.t); say.t = setTimeout(function(){ status.textContent = ''; }, 6000); }
 
-  /* 복사: clipboard API가 700ms 안에 끝나지 않으면 textarea 폴백 · 완료 표시는 한 번만 */
+  /* 복사 실패 시 대체 복사 결과까지 확인 */
   function copy(text, btn){
     var settled = false;
     function done(){
@@ -275,11 +286,13 @@ footer nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 .3
       var ta = document.createElement('textarea');
       ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
       document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); } catch (e) { /* 구형 브라우저 · 무시 */ }
-      ta.remove(); done();
+      var copied = false;
+      try { copied = document.execCommand('copy'); } catch (e) {}
+      ta.remove();
+      if (copied) done();
+      else { settled = true; say('복사하지 못했습니다. 문장을 직접 선택해 복사해 주세요.'); }
     }
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      setTimeout(function(){ if (!settled) fallback(); }, 700);
       navigator.clipboard.writeText(text).then(done).catch(fallback);
     } else {
       fallback();
